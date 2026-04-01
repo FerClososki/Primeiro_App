@@ -17,7 +17,6 @@ import { useState } from "react";
 // Cada um representa um tipo de elemento na tela (caixas, texto, entrada, etc..)
 
 import {
-  Alert,
   Button,
   StatusBar, // Barra de status do sistema (hora, bateria, internet); podendo ajustar o estilo 
   StyleSheet, // API para criar estilo de forma otimizada e tipada
@@ -26,6 +25,9 @@ import {
   TouchableOpacity, // Area tocavel com feedback visual (opacidade ao tocar)
   View // Container generico - equivalente a <div> na web, agrupa o layout 
 } from 'react-native';
+
+//Importamos a segunda tela criada em arquivo separado
+import SegundaTela from './SegundaTela';
 
 /**
  * Componente funcional App: é uma função que retorna o que deve aparecer na tela.
@@ -41,6 +43,11 @@ function App() {
   // Função chamada sempre que o usuário altera o texto no TextInput.
   // o parámetro "texto" é conteúdo atual do campo apos a digitação.
 
+  // Estado que representa qual tela está ativa.
+  // "home" = primeira tela (esta conteúdo).
+  // "segunda" = componente SegundaTela 
+  const [telaAtual, setTelaAtual] = useState<'home' | 'segunda'>('home');
+
   const aoDigitarNome = (texto: string) => {
     // Atualiza o estado; a interface mostrará "Olá, ..." com um novo valor.
     setNome(texto);
@@ -50,6 +57,26 @@ function App() {
   const limparNome = () => {
     setNome('');
   };
+  // Função que 'navega' para a segunda tela.
+  //Aqui, navegar significa apenas mudar o valor do estado telaAtual.
+  const irParaSegundaTela = () => {
+    setTelaAtual('segunda');
+  };
+
+  //Função que volta para a tela inicial.
+  const voltarParaHome = () => {
+    setTelaAtual('home');
+  }
+
+  // Navegação sem biblioteca. 
+  // Se telaAtual for "segunda", renderizamos o componente segundaTela.
+  // Note a passagem de props (propiedade).
+  // - nome{nome} envia o nome digitado.
+  // aoVoltar={voltarParaHome} envie a função de voltar.
+  
+  if (telaAtual === 'segunda') {
+    return <SegundaTela nome={nome} aoVoltar= {voltarParaHome} />;
+  }
 
   // return com JSX/TSX: Descreve a hierarquia visual da tela.
   return (
@@ -80,25 +107,16 @@ function App() {
       já atualiza ao digitar)
       } */}
       <View style={styles.espacoBotao}>
-        <Button
-          title="Mostrar saudação (alerta)"
-          color="#2563eb"
-          onPress={() => {
-            Alert.alert(
-              "Olá",
-              nome.trim()
-                ? `Prazer em te conhecer, ${nome.trim()}!`
-                : 'Digite um nome no campo acima',
-            );
-          }}
+        <Button title= "Ir para proxima tela"
+        color= "#2563eb" onPress={irParaSegundaTela}
         />
       </View>
       <Text style={styles.saudacao}>Olá, {nome}</Text>
       {/* Botão extra: TouchableOpacity envolve o text para estilo customizado. */}
       <TouchableOpacity
-      style={styles.botaoLimpar}
-      onPress={limparNome}
-      activeOpacity={0.7}
+        style={styles.botaoLimpar}
+        onPress={limparNome}
+        activeOpacity={0.7}
       >
         <Text style={styles.botaoLimparTexto}>Limpar Nome</Text>
       </TouchableOpacity>
@@ -147,13 +165,13 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 320.
   },
-  saudacao:{
+  saudacao: {
     fontSize: 20,
     fontWeight: '600',
     color: '#111827',
     marginBottom: 24,
     textAlign: 'center',
-  }, 
+  },
   botaoLimpar: {
     backgroundColor: '#e5e7eb',
     paddingVertical: 12,
